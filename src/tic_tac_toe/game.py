@@ -22,8 +22,9 @@ class TicTacToe:
 
     def get_valid_moves(self) -> list[tuple[int, int]]:
         return list(
+            # Get indices of empty cells
             zip(*np.where(self.board == 0), strict=False),
-        )  # Get indices of empty cells
+        )
 
     def is_valid_move(self, move: tuple[int, int]) -> bool:
         return bool(self.board[move[0], move[1]] == 0)  # Check if the cell is empty
@@ -57,8 +58,10 @@ class TicTacToe:
         return False
 
     def print_board(self) -> None:
-        for _row in self.board:
-            pass
+        symbols = {0: "-", 1: "X", 2: "O"}
+        for row in self.board:
+            print("|".join(symbols[cell] for cell in row))
+            print("-" * 5)
 
 
 # Example usage:

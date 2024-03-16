@@ -63,6 +63,7 @@ ignore = [
     "ANN",      # Type hints related, let mypy handle these.
     "D",        # Docstrings related, way too strict to our taste
     "PLR2004",  # Plain stupid rule
+    "T201",     # Print is fine
 ]
 
 [tool.ruff.lint.per-file-ignores]
