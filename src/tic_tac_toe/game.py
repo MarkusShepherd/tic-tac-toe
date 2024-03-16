@@ -57,18 +57,20 @@ class TicTacToe:
             return True
         return False
 
-    def print_board(self) -> None:
+    def print_board(self) -> str:
         symbols = {0: "-", 1: "X", 2: "O"}
+        result = ""
         for row in self.board:
-            print("|".join(symbols[cell] for cell in row))
-            print("-" * 5)
+            result += "|".join(symbols[cell] for cell in row) + "\n"
+            result += "-" * 5 + "\n"
+        return result
 
 
 # Example usage:
 if __name__ == "__main__":
     game = TicTacToe()
     while not game.game_over:
-        game.print_board()
+        print(game.print_board())
         valid_moves = game.get_valid_moves()
         move_str = input("Enter your move (row col): ")
         move = tuple(map(int, move_str.split()))
@@ -76,7 +78,7 @@ if __name__ == "__main__":
             game.make_move(move)
         else:
             pass
-    game.print_board()
+    print(game.print_board())
     if game.winner:
         pass
     else:
