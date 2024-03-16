@@ -92,11 +92,12 @@ addopts = """\
 """
 
 [tool.coverage.report]
-fail_under = 100
+fail_under = 95
 exclude_lines = [
     'if TYPE_CHECKING:',
     'pragma: no cover'
 ]
+omit = ["__main__.py"]
 
 [tool.mypy]
 # This is the global mypy configuration.

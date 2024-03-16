@@ -110,7 +110,3 @@ class TicTacToeTests(unittest.TestCase):
         expected_output = "X|-|-\n-----\n-|O|-\n-----\n-|-|X\n-----\n"
 
         assert game.print_board() == expected_output
-
-
-if __name__ == "__main__":
-    unittest.main()
