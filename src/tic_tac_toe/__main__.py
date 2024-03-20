@@ -4,7 +4,7 @@ from tic_tac_toe.game import TicTacToe
 def main() -> None:
     game = TicTacToe()
     while not game.game_over:
-        print(game.print_board())
+        print(game)
         valid_moves = game.get_valid_moves()
         print("Valid moves:", valid_moves)
         move_str = input("Enter your move (row col): ")
@@ -13,7 +13,7 @@ def main() -> None:
             game.make_move(move)
         else:
             print("Invalid move. Try again.")
-    print(game.print_board())
+    print(game)
     if game.winner:
         print("Player", game.winner, "wins!")
     else:

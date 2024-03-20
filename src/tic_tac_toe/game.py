@@ -4,6 +4,8 @@ import numpy as np
 
 
 class TicTacToe:
+    symbols = ("-", "X", "O")
+
     def __init__(self) -> None:
         # Initialize an empty board
         self.board: np.ndarray[int, np.dtype[Any]] = np.zeros(
@@ -13,6 +15,7 @@ class TicTacToe:
         self.current_player: int = 1  # Player 1 starts the game
         self.winner: int | None = None
         self.game_over: bool = False
+        self.symbols_to_int = {symbol: idx for idx, symbol in enumerate(self.symbols)}
 
     def reset(self) -> None:
         self.board = np.zeros((3, 3), dtype=int)
@@ -57,10 +60,17 @@ class TicTacToe:
             return True
         return False
 
-    def print_board(self) -> str:
-        symbols = {0: "-", 1: "X", 2: "O"}
-        result = ""
-        for row in self.board:
-            result += "|".join(symbols[cell] for cell in row) + "\n"
-            result += "-" * 5 + "\n"
-        return result
+    def __str__(self) -> str:
+        rows = ["".join(self.symbols[cell] for cell in row) for row in self.board]
+        return "\n".join(rows)
+
+    def state_to_str(self) -> str:
+        return str(self)
+
+    def str_to_state(self, state: str) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
+        board = np.array(
+            [[self.symbols_to_int[cell] for cell in row] for row in state.split("\n")],
+            dtype=int,
+        )
+        current_player = 1 if state.count("X") <= state.count("O") else 2
+        return board, current_player

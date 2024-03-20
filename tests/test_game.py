@@ -101,7 +101,7 @@ class TicTacToeTests(unittest.TestCase):
 
         assert not game.check_winner()
 
-    def test_print_board(self) -> None:
+    def test_board_str(self) -> None:
         game = TicTacToe()
         game.board[0, 0] = 1
         game.board[1, 1] = 2
@@ -109,4 +109,4 @@ class TicTacToeTests(unittest.TestCase):
 
         expected_output = "X|-|-\n-----\n-|O|-\n-----\n-|-|X\n-----\n"
 
-        assert game.print_board() == expected_output
+        assert str(game) == expected_output
