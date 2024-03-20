@@ -108,7 +108,8 @@ class TicTacToeTests(unittest.TestCase):
     def test_board_str(self) -> None:
         game = TicTacToe()
         game.board = self.board
-        assert str(game) == self.state_str
+        expected_str = f"Current player: Player 1 (X)\n{self.state_str}"
+        assert str(game) == expected_str
 
     def test_state_to_str(self) -> None:
         game = TicTacToe()

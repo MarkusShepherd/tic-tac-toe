@@ -73,11 +73,13 @@ class TicTacToe:
         return False
 
     def __str__(self) -> str:
-        rows = ["".join(self.symbols[cell] for cell in row) for row in self.board]
-        return "\n".join(rows)
+        player_name = self.players[self.current_player].name
+        player_symbol = self.symbols[self.current_player]
+        return f"Current player: {player_name} ({player_symbol})\n{self.state_to_str()}"
 
     def state_to_str(self) -> str:
-        return str(self)
+        rows = ["".join(self.symbols[cell] for cell in row) for row in self.board]
+        return "\n".join(rows)
 
     @classmethod
     def str_to_state(cls, state: str) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
