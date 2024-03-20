@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any, ClassVar
 
 import numpy as np
@@ -9,7 +10,14 @@ class TicTacToe:
         symbol: idx for idx, symbol in enumerate(symbols)
     }
 
-    def __init__(self) -> None:
+    def __init__(self, players: Iterable["Player"] | None = None) -> None:
+        players = tuple(players) if players is not None else ()
+        if len(players) > 2:
+            raise ValueError("TicTacToe can only have 2 players.")
+        while len(players) < 2:
+            players += (Player(f"Player {len(players) + 1}"),)
+        self.players = players
+
         # Initialize an empty board
         self.board: np.ndarray[int, np.dtype[Any]] = np.zeros(
             (3, 3),
