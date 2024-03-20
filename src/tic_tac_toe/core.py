@@ -107,11 +107,13 @@ class TicTacToe:
 
     def play(self) -> None:
         while not self.finished:
+            print(self)
             current_player = self.players[self.current_player]
             move = current_player.action()
             assert self.is_valid_move(move)
             self.make_move(move)
 
+        print(self)
         if self.winner:
             print(f"Player {self.winner} wins!")
         else:
@@ -143,3 +145,8 @@ class Player:
 
     def action(self) -> tuple[int, int]:
         return self.rng.choice(self.game.get_valid_moves())  # type: ignore[no-any-return]
+
+
+if __name__ == "__main__":
+    game = TicTacToe()
+    game.play()
