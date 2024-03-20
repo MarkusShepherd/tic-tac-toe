@@ -1,4 +1,4 @@
-from tic_tac_toe.game import TicTacToe
+from tic_tac_toe.core import TicTacToe
 
 
 def main() -> None:
