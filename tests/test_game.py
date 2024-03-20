@@ -120,3 +120,17 @@ class TicTacToeTests(unittest.TestCase):
         board, current_player = TicTacToe.str_to_state(self.state_str)
         assert np.array_equal(board, self.board)
         assert current_player == expected_current_player
+
+    def test_state_to_int(self) -> None:
+        game = TicTacToe()
+        game.board = self.board
+        expected_result = int("100020001", 3)
+        result = game.state_to_int()
+        assert result == expected_result
+
+    def test_int_to_state(self) -> None:
+        state_int = int("100020001", 3)
+        expected_current_player = 2
+        board, current_player = TicTacToe.int_to_state(state_int)
+        assert np.array_equal(board, self.board)
+        assert current_player == expected_current_player
