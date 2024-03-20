@@ -5,6 +5,9 @@ from tic_tac_toe.game import TicTacToe
 
 
 class TicTacToeTests(unittest.TestCase):
+    state_str = "X--\n-O-\n--X"
+    board = np.array([[1, 0, 0], [0, 2, 0], [0, 0, 1]], dtype=int)
+
     def test_initial_state(self) -> None:
         game = TicTacToe()
         assert game.board.tolist() == [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -104,30 +107,16 @@ class TicTacToeTests(unittest.TestCase):
 
     def test_board_str(self) -> None:
         game = TicTacToe()
-        game.board[0, 0] = 1
-        game.board[1, 1] = 2
-        game.board[2, 2] = 1
-
-        expected_output = "X--\n-O-\n--X"
-
-        assert str(game) == expected_output
+        game.board = self.board
+        assert str(game) == self.state_str
 
     def test_state_to_str(self) -> None:
         game = TicTacToe()
-        game.board[0, 0] = 1
-        game.board[1, 1] = 2
-        game.board[2, 2] = 1
-
-        expected_output = "X--\n-O-\n--X"
-
-        assert game.state_to_str() == expected_output
+        game.board = self.board
+        assert game.state_to_str() == self.state_str
 
     def test_str_to_state(self) -> None:
-        state = "X--\n-O-\n--X"
-        expected_board = np.array([[1, 0, 0], [0, 2, 0], [0, 0, 1]], dtype=int)
         expected_current_player = 2
-
-        board, current_player = TicTacToe.str_to_state(state)
-
-        assert np.array_equal(board, expected_board)
+        board, current_player = TicTacToe.str_to_state(self.state_str)
+        assert np.array_equal(board, self.board)
         assert current_player == expected_current_player
