@@ -92,3 +92,30 @@ class TicTacToe:
         ).reshape(3, 3)
         current_player = 1 if np.sum(board == 1) <= np.sum(board == 2) else 2
         return board, current_player
+
+
+class Player:
+    name: str
+    elo_rating: float
+
+    game: TicTacToe
+
+    def __init__(
+        self,
+        name: str,
+        elo_rating: float | None = None,
+        random_seed: int | None = None,
+    ) -> None:
+        self.name = name
+        self.elo_rating = elo_rating or 1200
+        self.rng = np.random.default_rng(random_seed)
+
+    def __str__(self) -> str:
+        return f"Player <{self.name}>"
+
+    def reset(self, game: TicTacToe) -> None:
+        """Reset the player."""
+        self.game = game
+
+    def action(self) -> tuple[int, int]:
+        return self.rng.choice(self.game.get_valid_moves())  # type: ignore[no-any-return]
