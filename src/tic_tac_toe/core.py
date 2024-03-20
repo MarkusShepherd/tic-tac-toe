@@ -105,6 +105,18 @@ class TicTacToe:
         current_player = 1 if np.sum(board == 1) <= np.sum(board == 2) else 2
         return board, current_player
 
+    def play(self) -> None:
+        while not self.finished:
+            current_player = self.players[self.current_player]
+            move = current_player.action()
+            assert self.is_valid_move(move)
+            self.make_move(move)
+
+        if self.winner:
+            print(f"Player {self.winner} wins!")
+        else:
+            print("It's a draw!")
+
 
 class Player:
     name: str

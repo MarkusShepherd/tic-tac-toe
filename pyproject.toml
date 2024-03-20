@@ -66,6 +66,7 @@ ignore = [
     "T201",     # Print is fine
     "TRY003",
     "EM101",
+    "S101",
 ]
 
 [tool.ruff.lint.per-file-ignores]
