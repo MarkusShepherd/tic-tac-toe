@@ -3,7 +3,7 @@ from tic_tac_toe.core import TicTacToe
 
 def main() -> None:
     game = TicTacToe()
-    while not game.game_over:
+    while not game.finished:
         print(game)
         valid_moves = game.get_valid_moves()
         print("Valid moves:", valid_moves)

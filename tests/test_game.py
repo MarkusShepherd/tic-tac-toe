@@ -13,21 +13,21 @@ class TicTacToeTests(unittest.TestCase):
         assert game.board.tolist() == [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         assert game.current_player == 1
         assert game.winner is None
-        assert not game.game_over
+        assert not game.finished
 
     def test_reset(self) -> None:
         game = TicTacToe()
         game.board[0, 0] = 1
         game.current_player = 2
         game.winner = 1
-        game.game_over = True
+        game.finished = True
 
         game.reset()
 
         assert game.board.tolist() == [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         assert game.current_player == 1
         assert game.winner is None
-        assert not game.game_over
+        assert not game.finished
 
     def test_get_valid_moves(self) -> None:
         game = TicTacToe()
@@ -59,7 +59,7 @@ class TicTacToeTests(unittest.TestCase):
         assert game.board.tolist() == [[1, 1, 1], [2, 2, 0], [0, 0, 0]]
         assert game.current_player == 2
         assert game.winner == 1
-        assert game.game_over
+        assert game.finished
 
     def test_check_winner(self) -> None:
         game = TicTacToe()

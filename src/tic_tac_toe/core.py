@@ -13,7 +13,7 @@ class TicTacToe:
     board: np.ndarray[int, np.dtype[Any]]
     current_player: int
     winner: int | None
-    game_over: bool
+    finished: bool
 
     def __init__(self, players: Iterable["Player"] | None = None) -> None:
         players = tuple(players) if players is not None else ()
@@ -32,7 +32,7 @@ class TicTacToe:
         self.board = np.zeros((3, 3), dtype=int)
         self.current_player = 1
         self.winner = None
-        self.game_over = False
+        self.finished = False
 
     def get_valid_moves(self) -> list[tuple[int, int]]:
         return list(
@@ -44,16 +44,16 @@ class TicTacToe:
         return bool(self.board[move[0], move[1]] == 0)  # Check if the cell is empty
 
     def make_move(self, move: tuple[int, int]) -> bool:
-        if not self.is_valid_move(move) or self.game_over:
+        if not self.is_valid_move(move) or self.finished:
             return False
 
         self.board[move[0], move[1]] = self.current_player
 
         if self.check_winner():
-            self.game_over = True
+            self.finished = True
             self.winner = self.current_player
         elif not self.get_valid_moves():
-            self.game_over = True  # Draw
+            self.finished = True  # Draw
 
         self.current_player = 3 - self.current_player  # Switch players
         return True
