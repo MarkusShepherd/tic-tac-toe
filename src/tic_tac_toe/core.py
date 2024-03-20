@@ -21,14 +21,15 @@ class TicTacToe:
             raise ValueError("TicTacToe can only have 2 players.")
         while len(players) < 2:
             players += (Player(f"Player {len(players) + 1}"),)
-        self.players = players
+        self.players = (Player("Dummy"), *players)
 
         # Initialize an empty board
         self.reset()
 
     def reset(self) -> None:
         for player in self.players:
-            player.reset(self)
+            if player is not None:
+                player.reset(self)
         self.board = np.zeros((3, 3), dtype=int)
         self.current_player = 1
         self.winner = None
