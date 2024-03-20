@@ -10,6 +10,11 @@ class TicTacToe:
         symbol: idx for idx, symbol in enumerate(symbols)
     }
 
+    board: np.ndarray[int, np.dtype[Any]]
+    current_player: int
+    winner: int | None
+    game_over: bool
+
     def __init__(self, players: Iterable["Player"] | None = None) -> None:
         players = tuple(players) if players is not None else ()
         if len(players) > 2:
@@ -19,15 +24,11 @@ class TicTacToe:
         self.players = players
 
         # Initialize an empty board
-        self.board: np.ndarray[int, np.dtype[Any]] = np.zeros(
-            (3, 3),
-            dtype=int,
-        )
-        self.current_player: int = 1  # Player 1 starts the game
-        self.winner: int | None = None
-        self.game_over: bool = False
+        self.reset()
 
     def reset(self) -> None:
+        for player in self.players:
+            player.reset(self)
         self.board = np.zeros((3, 3), dtype=int)
         self.current_player = 1
         self.winner = None
