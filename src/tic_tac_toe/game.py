@@ -75,5 +75,20 @@ class TicTacToe:
             [[cls.symbols_to_int[cell] for cell in row] for row in state.split("\n")],
             dtype=int,
         )
-        current_player = 1 if state.count("X") <= state.count("O") else 2
+        current_player = 1 if np.sum(board == 1) <= np.sum(board == 2) else 2
+        return board, current_player
+
+    def state_to_int(self) -> int:
+        # Every cell can be in one of three states,
+        # so we can treat the board as a base-3 number
+        return int("".join(map(str, self.board.flatten())), 3)
+
+    @classmethod
+    def int_to_state(cls, state_int: int) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
+        # Convert the base-3 number to a 3x3 array
+        board = np.array(
+            list(np.base_repr(state_int, base=3).zfill(9)),
+            dtype=int,
+        ).reshape(3, 3)
+        current_player = 1 if np.sum(board == 1) <= np.sum(board == 2) else 2
         return board, current_player
