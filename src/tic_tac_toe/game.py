@@ -1,10 +1,13 @@
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
 
 class TicTacToe:
-    symbols = ("-", "X", "O")
+    symbols: tuple[str, str, str] = ("-", "X", "O")
+    symbols_to_int: ClassVar[dict[str, int]] = {
+        symbol: idx for idx, symbol in enumerate(symbols)
+    }
 
     def __init__(self) -> None:
         # Initialize an empty board
@@ -15,7 +18,6 @@ class TicTacToe:
         self.current_player: int = 1  # Player 1 starts the game
         self.winner: int | None = None
         self.game_over: bool = False
-        self.symbols_to_int = {symbol: idx for idx, symbol in enumerate(self.symbols)}
 
     def reset(self) -> None:
         self.board = np.zeros((3, 3), dtype=int)
@@ -67,9 +69,10 @@ class TicTacToe:
     def state_to_str(self) -> str:
         return str(self)
 
-    def str_to_state(self, state: str) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
+    @classmethod
+    def str_to_state(cls, state: str) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
         board = np.array(
-            [[self.symbols_to_int[cell] for cell in row] for row in state.split("\n")],
+            [[cls.symbols_to_int[cell] for cell in row] for row in state.split("\n")],
             dtype=int,
         )
         current_player = 1 if state.count("X") <= state.count("O") else 2

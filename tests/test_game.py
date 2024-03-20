@@ -1,5 +1,6 @@
 import unittest
 
+import numpy as np
 from tic_tac_toe.game import TicTacToe
 
 
@@ -107,6 +108,26 @@ class TicTacToeTests(unittest.TestCase):
         game.board[1, 1] = 2
         game.board[2, 2] = 1
 
-        expected_output = "X|-|-\n-----\n-|O|-\n-----\n-|-|X\n-----\n"
+        expected_output = "X--\n-O-\n--X"
 
         assert str(game) == expected_output
+
+    def test_state_to_str(self) -> None:
+        game = TicTacToe()
+        game.board[0, 0] = 1
+        game.board[1, 1] = 2
+        game.board[2, 2] = 1
+
+        expected_output = "X--\n-O-\n--X"
+
+        assert game.state_to_str() == expected_output
+
+    def test_str_to_state(self) -> None:
+        state = "X--\n-O-\n--X"
+        expected_board = np.array([[1, 0, 0], [0, 2, 0], [0, 0, 1]], dtype=int)
+        expected_current_player = 2
+
+        board, current_player = TicTacToe.str_to_state(state)
+
+        assert np.array_equal(board, expected_board)
+        assert current_player == expected_current_player
