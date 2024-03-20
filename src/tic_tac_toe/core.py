@@ -41,13 +41,13 @@ class TicTacToe:
         )
 
     def is_valid_move(self, move: tuple[int, int]) -> bool:
-        return bool(self.board[move[0], move[1]] == 0)  # Check if the cell is empty
+        return bool(self.board[*move] == 0)  # Check if the cell is empty
 
     def make_move(self, move: tuple[int, int]) -> bool:
         if not self.is_valid_move(move) or self.finished:
             return False
 
-        self.board[move[0], move[1]] = self.current_player
+        self.board[*move] = self.current_player
 
         if self.check_winner():
             self.finished = True
