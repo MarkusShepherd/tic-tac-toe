@@ -145,7 +145,7 @@ class Player:
         self.game = game
 
     def action(self) -> tuple[int, int]:
-        return self.rng.choice(self.game.get_valid_moves())  # type: ignore[no-any-return]
+        return tuple(self.rng.choice(self.game.get_valid_moves()))
 
 
 class HumanPlayer(Player):
