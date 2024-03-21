@@ -1,3 +1,5 @@
+import random
+import re
 from collections.abc import Iterable
 from typing import Any, ClassVar
 
@@ -147,6 +149,25 @@ class Player:
         return self.rng.choice(self.game.get_valid_moves())  # type: ignore[no-any-return]
 
 
+class HumanPlayer(Player):
+    def action(self) -> tuple[int, int]:
+        print(f"{self.game}\n{self.game.get_valid_moves()}")
+        response = input("Enter move (row, column): ")
+        while True:
+            match = re.match(r"(\d)\D+(\d)", response)
+            if match:
+                move = tuple(map(int, match.groups()))
+                assert len(move) == 2
+                if self.game.is_valid_move(move):
+                    return move
+            response = input("Invalid move. Enter move (row, column): ")
+
+
 if __name__ == "__main__":
-    game = TicTacToe()
+    players = [
+        HumanPlayer("You"),
+        Player("Random"),
+    ]
+    random.shuffle(players)
+    game = TicTacToe(players=players)
     game.play()
