@@ -1,25 +1,17 @@
-from tic_tac_toe.core import TicTacToe
+import random
+
+from tic_tac_toe.core import HumanPlayer, Player, TicTacToe
 
 
 def main() -> None:
-    game = TicTacToe()
-    while not game.finished:
-        print(game)
-        valid_moves = game.get_valid_moves()
-        print("Valid moves:", valid_moves)
-        move_str = input("Enter your move (row col): ")
-        move = tuple(map(int, move_str.split()))
-        if len(move) == 2 and move in valid_moves:
-            game.make_move(move)
-        else:
-            print("Invalid move. Try again.")
-    print(game)
-    if game.winner:
-        print("Player", game.winner, "wins!")
-    else:
-        print("It's a draw!")
+    players = [
+        HumanPlayer("You"),
+        Player("Random"),
+    ]
+    random.shuffle(players)
+    game = TicTacToe(players=players)
+    game.play()
 
 
-# Example usage:
 if __name__ == "__main__":
     main()

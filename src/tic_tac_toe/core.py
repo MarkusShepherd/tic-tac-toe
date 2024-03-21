@@ -1,4 +1,3 @@
-import random
 import re
 from collections.abc import Iterable
 from typing import Any, ClassVar
@@ -161,13 +160,3 @@ class HumanPlayer(Player):
                 if self.game.is_valid_move(move):
                     return move
             response = input("Invalid move. Enter move (row, column): ")
-
-
-if __name__ == "__main__":
-    players = [
-        HumanPlayer("You"),
-        Player("Random"),
-    ]
-    random.shuffle(players)
-    game = TicTacToe(players=players)
-    game.play()
