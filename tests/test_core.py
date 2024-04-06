@@ -2,12 +2,23 @@ import unittest
 from unittest import mock
 
 import numpy as np
+import pytest
 from tic_tac_toe.core import HumanPlayer, Player, TicTacToe
 
 
 class TicTacToeTests(unittest.TestCase):
     state_str = "X--\n-O-\n--X"
     board = np.array([[1, 0, 0], [0, 2, 0], [0, 0, 1]], dtype=int)
+
+    def test_more_than_two_players(self) -> None:
+        with pytest.raises(ValueError, match="only have 2 players"):
+            TicTacToe(
+                players=[
+                    Player("John Doe"),
+                    Player("Jane Smith"),
+                    Player("Alice"),
+                ],
+            )
 
     def test_initial_state(self) -> None:
         game = TicTacToe()
@@ -62,6 +73,16 @@ class TicTacToeTests(unittest.TestCase):
         assert game.winner == 1
         assert game.finished
 
+    def test_make_invalid_move(self) -> None:
+        game = TicTacToe()
+        game.make_move((0, 0))
+        game.make_move((1, 1))
+        game.make_move((0, 1))
+        game.make_move((1, 0))
+        game.make_move((0, 2))
+
+        assert not game.make_move((1, 2))
+
     def test_check_winner(self) -> None:
         game = TicTacToe()
         game.current_player = 1
@@ -105,6 +126,14 @@ class TicTacToeTests(unittest.TestCase):
         game.board[2, 2] = 1
 
         assert not game.check_winner()
+
+    def test_check_draw(self) -> None:
+        game = TicTacToe()
+        game.board = np.array([[1, 2, 1], [1, 2, 2], [2, 1, 0]], dtype=int)
+        assert game.make_move((2, 2))
+        assert not game.check_winner()
+        assert game.finished
+        assert game.winner is None
 
     def test_board_str(self) -> None:
         game = TicTacToe()
