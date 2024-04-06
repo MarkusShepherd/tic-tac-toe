@@ -114,7 +114,6 @@ class TicTacToe:
             assert self.is_valid_move(move)
             self.make_move(move)
 
-        print(self)
         if self.winner:
             print(f"Player {self.winner} wins!")
         else:
@@ -150,7 +149,7 @@ class Player:
 
 class HumanPlayer(Player):
     def action(self) -> tuple[int, int]:
-        print(f"{self.game}\n{self.game.get_valid_moves()}")
+        print(f"{self.game.get_valid_moves()}")
         response = input("Enter move (row, column): ")
         while True:
             match = re.match(r"(\d)\D+(\d)", response)
