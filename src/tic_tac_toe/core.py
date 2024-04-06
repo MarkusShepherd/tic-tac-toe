@@ -182,11 +182,13 @@ class Player:
 
 
 class HumanPlayer(Player):
+    match_regex = re.compile(r"\D*(\d)\D+(\d)")
+
     def action(self) -> Action:
         print(f"{self.game.get_valid_moves()}")
         response = input("Enter move (row, column): ")
         while True:
-            match = re.match(r"(\d)\D+(\d)", response)
+            match = self.match_regex.match(response)
             if match:
                 move = tuple(map(int, match.groups()))
                 assert len(move) == 2
