@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from typing import Any, ClassVar
 
 import numpy as np
+from tqdm import trange
 
 Action = tuple[int, int]
 
@@ -192,3 +193,18 @@ class HumanPlayer(Player):
                 if self.game.is_valid_move(move):
                     return move
             response = input("Invalid move. Enter move (row, column): ")
+
+
+def main() -> None:
+    player_1 = Player("🤖1️⃣")
+    player_2 = Player("🤖2️⃣")
+    game = TicTacToe(players=(player_1, player_2), verbose=False)
+    for _ in trange(10_000):
+        game.play()
+        game.reset()
+    print(player_1.state_values["---\n---\n---"])
+    print(player_2.state_values["---\n---\n---"])
+
+
+if __name__ == "__main__":
+    main()
