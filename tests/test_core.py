@@ -228,3 +228,16 @@ class PlayerTests2(unittest.TestCase):
         valid_moves = [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
         action = player.action()
         assert action in valid_moves
+
+    def test_play_game_with_winner(self) -> None:
+        game = TicTacToe()
+        game.play()
+        assert game.finished
+
+    def test_play_game_with_draw(self) -> None:
+        game = TicTacToe()
+        game.board = np.array([[1, 2, 1], [1, 2, 2], [2, 1, 0]], dtype=int)
+        game.current_player = 1
+        game.play()
+        assert game.finished
+        assert game.winner is None
