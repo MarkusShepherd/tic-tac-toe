@@ -16,13 +16,21 @@ class TicTacToe:
     winner: int | None
     finished: bool
 
-    def __init__(self, players: Iterable["Player"] | None = None) -> None:
+    def __init__(
+        self,
+        players: Iterable["Player"] | None = None,
+        *,
+        trainer: "TicTacToeTrainer | None" = None,
+        verbose: bool = False,
+    ) -> None:
         players = tuple(players) if players is not None else ()
         if len(players) > 2:
             raise ValueError("TicTacToe can only have 2 players.")
         while len(players) < 2:
             players += (Player(f"Player {len(players) + 1}"),)
         self.players = (Player("Dummy"), *players)
+        self.trainer = trainer
+        self.verbose = verbose
 
         # Initialize an empty board
         self.reset()
@@ -31,6 +39,8 @@ class TicTacToe:
         for player in self.players:
             if player is not None:
                 player.reset(self)
+        if self.trainer:
+            self.trainer.reset()
         self.board = np.zeros((3, 3), dtype=int)
         self.current_player = 1
         self.winner = None
@@ -108,16 +118,48 @@ class TicTacToe:
 
     def play(self) -> None:
         while not self.finished:
-            print(self)
-            current_player = self.players[self.current_player]
-            move = current_player.action()
-            assert self.is_valid_move(move)
-            self.make_move(move)
+            if self.verbose:
+                print(self)
 
-        if self.winner:
-            print(f"Player {self.winner} wins!")
-        else:
-            print("It's a draw!")
+            current_player = self.players[self.current_player]
+            state = self.state_to_str()
+
+            action = current_player.action()
+            assert self.is_valid_move(action)
+            self.make_move(action)
+
+            if self.trainer:
+                reward = 0 if not self.finished else 1 if self.winner else 0.5
+                next_state = self.state_to_str()
+                self.trainer.update(
+                    state=state,
+                    action=action,
+                    reward=reward,
+                    next_state=next_state,
+                    finished=self.finished,
+                )
+
+        if self.verbose:
+            if self.winner:
+                print(f"Player {self.winner} wins!")
+            else:
+                print("It's a draw!")
+
+
+class TicTacToeTrainer:
+    def update(
+        self,
+        *,
+        state: str,
+        action: tuple[int, int],
+        reward: float,
+        next_state: str,
+        finished: bool,
+    ) -> None:
+        raise NotImplementedError("This method must be implemented in a subclass.")
+
+    def reset(self) -> None:
+        pass
 
 
 class Player:
