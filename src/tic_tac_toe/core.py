@@ -4,6 +4,8 @@ from typing import Any, ClassVar
 
 import numpy as np
 
+Action = tuple[int, int]
+
 
 class TicTacToe:
     symbols: tuple[str, str, str] = ("-", "X", "O")
@@ -46,16 +48,16 @@ class TicTacToe:
         self.winner = None
         self.finished = False
 
-    def get_valid_moves(self) -> list[tuple[int, int]]:
+    def get_valid_moves(self) -> list[Action]:
         return list(
             # Get indices of empty cells
             zip(*np.where(self.board == 0), strict=False),
         )
 
-    def is_valid_move(self, move: tuple[int, int]) -> bool:
+    def is_valid_move(self, move: Action) -> bool:
         return bool(self.board[*move] == 0)  # Check if the cell is empty
 
-    def make_move(self, move: tuple[int, int]) -> bool:
+    def make_move(self, move: Action) -> bool:
         if not self.is_valid_move(move) or self.finished:
             return False
 
@@ -151,7 +153,7 @@ class TicTacToeTrainer:
         self,
         *,
         state: str,
-        action: tuple[int, int],
+        action: Action,
         reward: float,
         next_state: str,
         finished: bool,
@@ -185,12 +187,12 @@ class Player:
         """Reset the player."""
         self.game = game
 
-    def action(self) -> tuple[int, int]:
+    def action(self) -> Action:
         return tuple(self.rng.choice(self.game.get_valid_moves()))
 
 
 class HumanPlayer(Player):
-    def action(self) -> tuple[int, int]:
+    def action(self) -> Action:
         print(f"{self.game.get_valid_moves()}")
         response = input("Enter move (row, column): ")
         while True:
