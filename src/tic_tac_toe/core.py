@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 from collections.abc import Iterable
 from typing import Any, ClassVar
 
@@ -142,6 +143,10 @@ class Player:
 
     game: TicTacToe
 
+    state_values: dict[str, float]
+    returns: dict[str, list[float]]
+    state_buffer: list[str]
+
     def __init__(
         self,
         name: str,
@@ -151,6 +156,9 @@ class Player:
         self.name = name
         self.elo_rating = elo_rating or 1200
         self.rng = np.random.default_rng(random_seed)
+        self.state_values = defaultdict(float)
+        self.returns = defaultdict(list)
+        self.state_buffer = []
 
     def __str__(self) -> str:
         return f"Player <{self.name}>"
@@ -158,12 +166,18 @@ class Player:
     def reset(self, game: TicTacToe) -> None:
         """Reset the player."""
         self.game = game
+        self.state_buffer = []
 
     def action(self) -> Action:
+        """Select an action at random."""
+        self.state_buffer.append(self.game.state_to_str())
         return tuple(self.rng.choice(self.game.get_valid_moves()))
 
     def end_game(self, reward: float) -> None:
-        pass
+        """Update the state values based on the game outcome."""
+        for state in self.state_buffer:
+            self.returns[state].append(reward)
+            self.state_values[state] = float(np.mean(self.returns[state]))
 
 
 class HumanPlayer(Player):
