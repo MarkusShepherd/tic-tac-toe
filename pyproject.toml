@@ -33,6 +33,7 @@ packages = [
 python = ">=3.10.0, <4.0"
 
 numpy = "*"
+tqdm = "*"
 
 [tool.poetry.group.dev.dependencies]
 mkdocstrings = {version = ">=0.23", extras = ["python"]}
@@ -45,6 +46,7 @@ pytest-github-actions-annotate-failures = "*"
 pytest-cov = "*"
 python-kacl = "*"
 ruff = ">=0.2.0"
+types-tqdm = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
