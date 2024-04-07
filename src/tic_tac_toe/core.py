@@ -184,6 +184,39 @@ class Player:
             ) / self.state_counts[state]
 
 
+class HeuristicPlayer(Player):
+    def action(self) -> Action:
+        self.state_buffer.append(self.game.state_to_str())
+
+        # Check if we can win in the next move
+        for move in self.game.get_valid_moves():
+            self.game.board[move] = self.game.current_player
+            if self.game.check_winner():
+                self.game.board[move] = 0
+                return move
+            self.game.board[move] = 0
+
+        # Check if the opponent can win in the next move
+        for move in self.game.get_valid_moves():
+            self.game.board[move] = 3 - self.game.current_player
+            if self.game.check_winner():
+                self.game.board[move] = 0
+                return move
+            self.game.board[move] = 0
+
+        # Check if the center is empty
+        if self.game.board[1, 1] == 0:
+            return 1, 1
+
+        # Check if a corner is empty
+        for move in [(0, 0), (0, 2), (2, 0), (2, 2)]:
+            if self.game.board[move] == 0:
+                return move
+
+        # Select an empty cell at random
+        return tuple(self.rng.choice(self.game.get_valid_moves()))
+
+
 class HumanPlayer(Player):
     match_regex = re.compile(r"\D*(\d)\D+(\d)")
 
@@ -208,7 +241,7 @@ def format_state_value(game: TicTacToe) -> str:
 
 
 def main(num_games: int = 10_000) -> None:
-    player_1 = Player("🤖1️⃣")
+    player_1 = HeuristicPlayer("🤖1️⃣")
     player_2 = Player("🤖2️⃣")
     game = TicTacToe(players=(player_1, player_2), verbose=False)
     print(f"Playing {num_games} games…")
