@@ -305,7 +305,14 @@ def format_state_value(game: TicTacToe) -> str:
 
 def main(num_games: int = 10_000) -> None:
     player_1 = HeuristicPlayer("🤖1️⃣", epsilon=0.05)
-    player_2 = HeuristicPlayer("🤖2️⃣", epsilon=0.05)
+    player_2 = HeuristicPlayer(
+        "🤖2️⃣",
+        epsilon=None,
+        check_winning_move=True,
+        check_blocking_move=False,
+        check_center=False,
+        check_corners=False,
+    )
     game = TicTacToe(players=(player_1, player_2), verbose=False)
     print(f"Playing {num_games} games…")
     for _ in trange(num_games):
