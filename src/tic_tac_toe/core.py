@@ -146,7 +146,7 @@ class Player:
     game: TicTacToe
 
     state_values: dict[str, float]
-    returns: dict[str, list[float]]
+    state_counts: dict[str, int]
     state_buffer: list[str]
 
     def __init__(
@@ -159,7 +159,7 @@ class Player:
         self.elo_rating = elo_rating or 1200
         self.rng = np.random.default_rng(random_seed)
         self.state_values = defaultdict(float)
-        self.returns = defaultdict(list)
+        self.state_counts = defaultdict(int)
         self.state_buffer = []
 
     def __str__(self) -> str:
@@ -178,8 +178,10 @@ class Player:
     def end_game(self, reward: float) -> None:
         """Update the state values based on the game outcome."""
         for state in self.state_buffer:
-            self.returns[state].append(reward)
-            self.state_values[state] = float(np.mean(self.returns[state]))
+            self.state_counts[state] += 1
+            self.state_values[state] += (
+                reward - self.state_values[state]
+            ) / self.state_counts[state]
 
 
 class HumanPlayer(Player):
