@@ -53,7 +53,7 @@ class TicTacToe:
         )
 
     def is_valid_move(self, move: Action) -> bool:
-        return bool(self.board[*move] == 0)  # Check if the cell is empty
+        return bool(self.board[move[0], move[1]] == 0)  # Check if the cell is empty
 
     def make_move(self, move: Action) -> bool:
         if not self.is_valid_move(move) or self.finished:
