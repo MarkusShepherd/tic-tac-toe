@@ -1,5 +1,5 @@
 {
-  "template": "git@github.com:woltapp/wolt-python-package-cookiecutter.git",
+  "template": "https://github.com/woltapp/wolt-python-package-cookiecutter.git",
   "commit": "79dbc2cb6d9b4f5f3fa5e9db3f5fa7d447ced511",
   "checkout": null,
   "context": {
@@ -11,7 +11,7 @@
       "project_slug": "tic-tac-toe",
       "package_name": "tic_tac_toe",
       "project_short_description": "Tic Tac Toe Python implementation including Reinforcement Learning strategies",
-      "_template": "git@github.com:woltapp/wolt-python-package-cookiecutter.git"
+      "_template": "https://github.com/woltapp/wolt-python-package-cookiecutter.git"
     }
   },
   "directory": null
