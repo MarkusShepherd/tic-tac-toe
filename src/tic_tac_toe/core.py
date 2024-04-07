@@ -200,15 +200,27 @@ class HumanPlayer(Player):
             response = input("Invalid move. Enter move (row, column): ")
 
 
-def main() -> None:
+def format_state_value(game: TicTacToe) -> str:
+    players = game.players[1:]
+    state = game.state_to_str()
+    value = max(player.state_values[state] for player in players)
+    return f"State:\n{state}\nValue: {value:.5f}"
+
+
+def main(num_games: int = 10_000) -> None:
     player_1 = Player("🤖1️⃣")
     player_2 = Player("🤖2️⃣")
     game = TicTacToe(players=(player_1, player_2), verbose=False)
-    for _ in trange(10_000):
+    print(f"Playing {num_games} games…")
+    for _ in trange(num_games):
         game.play()
         game.reset()
-    print(player_1.state_values["---\n---\n---"])
-    print(player_2.state_values["---\n---\n---"])
+    print(format_state_value(game))
+    for x in range(3):
+        for y in range(3):
+            game.reset()
+            game.board[x, y] = 1
+            print(format_state_value(game))
 
 
 if __name__ == "__main__":
