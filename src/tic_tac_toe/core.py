@@ -192,33 +192,39 @@ class HeuristicPlayer(Player):
         name: str,
         *,
         epsilon: float | None = None,
+        check_winning_move: bool = True,
+        check_blocking_move: bool = True,
+        check_center: bool = True,
+        check_corners: bool = True,
         elo_rating: float | None = None,
         random_seed: int | None = None,
     ) -> None:
         super().__init__(name=name, elo_rating=elo_rating, random_seed=random_seed)
         self.epsilon = epsilon
+        self.check_winning_move = check_winning_move
+        self.check_blocking_move = check_blocking_move
+        self.check_center = check_center
+        self.check_corners = check_corners
 
     def _random_action(self) -> Action:
         return tuple(self.rng.choice(self.game.get_valid_moves()))
 
-    def action(self) -> Action:
-        self.state_buffer.append(self.game.state_to_str())
-
-        # Epsilon exploration
-        if self.epsilon and self.rng.random() < self.epsilon:
-            return self._random_action()
-
-        # Check if we can win in the next move
+    def _find_winning_move(self) -> Action | None:
+        if not self.check_winning_move:
+            return None
         valid_moves = self.game.get_valid_moves()
         self.rng.shuffle(valid_moves)
         for move in valid_moves:
             self.game.board[move] = self.game.current_player
-            if self.game.check_winner(player=self.game.current_player):
+            if self.game.check_winner():
                 self.game.board[move] = 0
                 return move
             self.game.board[move] = 0
+        return None
 
-        # Check if the opponent can win in the next move
+    def _find_blocking_move(self) -> Action | None:
+        if not self.check_blocking_move:
+            return None
         opponent = 3 - self.game.current_player
         valid_moves = self.game.get_valid_moves()
         self.rng.shuffle(valid_moves)
@@ -228,17 +234,47 @@ class HeuristicPlayer(Player):
                 self.game.board[move] = 0
                 return move
             self.game.board[move] = 0
+        return None
 
-        # Check if the center is empty
+    def _find_center_move(self) -> Action | None:
+        if not self.check_center:
+            return None
         if self.game.board[1, 1] == 0:
             return 1, 1
+        return None
 
-        # Check if a corner is empty
+    def _find_corner_move(self) -> Action | None:
+        if not self.check_corners:
+            return None
         corner_moves = [(0, 0), (0, 2), (2, 0), (2, 2)]
         self.rng.shuffle(corner_moves)
         for move in corner_moves:
             if self.game.board[move] == 0:
                 return move
+        return None
+
+    def action(self) -> Action:
+        self.state_buffer.append(self.game.state_to_str())
+
+        # Epsilon exploration
+        if self.epsilon and self.rng.random() < self.epsilon:
+            return self._random_action()
+
+        winning_move = self._find_winning_move()
+        if winning_move:
+            return winning_move
+
+        blocking_move = self._find_blocking_move()
+        if blocking_move:
+            return blocking_move
+
+        center_move = self._find_center_move()
+        if center_move:
+            return center_move
+
+        corner_move = self._find_corner_move()
+        if corner_move:
+            return corner_move
 
         # Select an empty cell at random
         return self._random_action()
