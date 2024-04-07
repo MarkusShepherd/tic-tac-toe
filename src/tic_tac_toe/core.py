@@ -31,6 +31,7 @@ class TicTacToe:
             raise ValueError("TicTacToe can only have 2 players.")
         while len(players) < 2:
             players += (Player(f"Player {len(players) + 1}"),)
+        assert len(players) == 2
         self.players = (Player("Dummy"), *players)
         self.verbose = verbose
 
@@ -59,7 +60,7 @@ class TicTacToe:
         if not self.is_valid_move(move) or self.finished:
             return False
 
-        self.board[*move] = self.current_player
+        self.board[move[0], move[1]] = self.current_player
 
         if self.check_winner():
             self.finished = True
