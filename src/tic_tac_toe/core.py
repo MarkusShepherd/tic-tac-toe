@@ -209,7 +209,9 @@ class HeuristicPlayer(Player):
             return self._random_action()
 
         # Check if we can win in the next move
-        for move in self.game.get_valid_moves():
+        valid_moves = self.game.get_valid_moves()
+        self.rng.shuffle(valid_moves)
+        for move in valid_moves:
             self.game.board[move] = self.game.current_player
             if self.game.check_winner(player=self.game.current_player):
                 self.game.board[move] = 0
@@ -218,7 +220,9 @@ class HeuristicPlayer(Player):
 
         # Check if the opponent can win in the next move
         opponent = 3 - self.game.current_player
-        for move in self.game.get_valid_moves():
+        valid_moves = self.game.get_valid_moves()
+        self.rng.shuffle(valid_moves)
+        for move in valid_moves:
             self.game.board[move] = opponent
             if self.game.check_winner(player=opponent):
                 self.game.board[move] = 0
@@ -230,7 +234,9 @@ class HeuristicPlayer(Player):
             return 1, 1
 
         # Check if a corner is empty
-        for move in [(0, 0), (0, 2), (2, 0), (2, 2)]:
+        corner_moves = [(0, 0), (0, 2), (2, 0), (2, 2)]
+        self.rng.shuffle(corner_moves)
+        for move in corner_moves:
             if self.game.board[move] == 0:
                 return move
 
@@ -262,19 +268,21 @@ def format_state_value(game: TicTacToe) -> str:
 
 
 def main(num_games: int = 10_000) -> None:
-    player_1 = HeuristicPlayer("🤖1️⃣")
-    player_2 = Player("🤖2️⃣")
+    player_1 = HeuristicPlayer("🤖1️⃣", epsilon=0.05)
+    player_2 = HeuristicPlayer("🤖2️⃣", epsilon=0.05)
     game = TicTacToe(players=(player_1, player_2), verbose=False)
     print(f"Playing {num_games} games…")
     for _ in trange(num_games):
         game.play()
         game.reset()
     print(format_state_value(game))
+    print()
     for x in range(3):
         for y in range(3):
             game.reset()
             game.board[x, y] = 1
             print(format_state_value(game))
+            print()
 
 
 if __name__ == "__main__":
