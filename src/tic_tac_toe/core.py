@@ -71,15 +71,15 @@ class TicTacToe:
         self.current_player = 3 - self.current_player  # Switch players
         return True
 
-    def check_winner(self) -> bool:
+    def check_winner(self, *, player: int | None = None) -> bool:
         # Check rows, columns, and diagonals for a win
+        player = player or self.current_player
+        assert player in (1, 2)
         for i in range(3):
-            if np.all(self.board[i, :] == self.current_player) or np.all(
-                self.board[:, i] == self.current_player,
-            ):
+            if np.all(self.board[i, :] == player) or np.all(self.board[:, i] == player):
                 return True
-        if np.all(np.diag(self.board) == self.current_player) or np.all(
-            np.diag(np.fliplr(self.board)) == self.current_player,
+        if np.all(np.diag(self.board) == player) or np.all(
+            np.diag(np.fliplr(self.board)) == player,
         ):
             return True
         return False
@@ -191,15 +191,16 @@ class HeuristicPlayer(Player):
         # Check if we can win in the next move
         for move in self.game.get_valid_moves():
             self.game.board[move] = self.game.current_player
-            if self.game.check_winner():
+            if self.game.check_winner(player=self.game.current_player):
                 self.game.board[move] = 0
                 return move
             self.game.board[move] = 0
 
         # Check if the opponent can win in the next move
+        opponent = 3 - self.game.current_player
         for move in self.game.get_valid_moves():
-            self.game.board[move] = 3 - self.game.current_player
-            if self.game.check_winner():
+            self.game.board[move] = opponent
+            if self.game.check_winner(player=opponent):
                 self.game.board[move] = 0
                 return move
             self.game.board[move] = 0
