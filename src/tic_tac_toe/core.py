@@ -153,6 +153,7 @@ class Player:
     def __init__(
         self,
         name: str,
+        *,
         elo_rating: float | None = None,
         random_seed: int | None = None,
     ) -> None:
@@ -186,8 +187,26 @@ class Player:
 
 
 class HeuristicPlayer(Player):
+    def __init__(
+        self,
+        name: str,
+        *,
+        epsilon: float | None = None,
+        elo_rating: float | None = None,
+        random_seed: int | None = None,
+    ) -> None:
+        super().__init__(name=name, elo_rating=elo_rating, random_seed=random_seed)
+        self.epsilon = epsilon
+
+    def _random_action(self) -> Action:
+        return tuple(self.rng.choice(self.game.get_valid_moves()))
+
     def action(self) -> Action:
         self.state_buffer.append(self.game.state_to_str())
+
+        # Epsilon exploration
+        if self.epsilon and self.rng.random() < self.epsilon:
+            return self._random_action()
 
         # Check if we can win in the next move
         for move in self.game.get_valid_moves():
@@ -216,7 +235,7 @@ class HeuristicPlayer(Player):
                 return move
 
         # Select an empty cell at random
-        return tuple(self.rng.choice(self.game.get_valid_moves()))
+        return self._random_action()
 
 
 class HumanPlayer(Player):
