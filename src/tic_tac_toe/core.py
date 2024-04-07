@@ -137,6 +137,7 @@ class TicTacToe:
                 print(f"Player {self.winner} wins!")
             else:
                 print("It's a draw!")
+            print(self.state_to_str())
 
 
 class Player:
