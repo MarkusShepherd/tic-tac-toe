@@ -1,8 +1,12 @@
 import re
+from collections import defaultdict
 from collections.abc import Iterable
 from typing import Any, ClassVar
 
 import numpy as np
+from tqdm import trange
+
+Action = tuple[int, int]
 
 
 class TicTacToe:
@@ -16,13 +20,20 @@ class TicTacToe:
     winner: int | None
     finished: bool
 
-    def __init__(self, players: Iterable["Player"] | None = None) -> None:
+    def __init__(
+        self,
+        players: Iterable["Player"] | None = None,
+        *,
+        verbose: bool = False,
+    ) -> None:
         players = tuple(players) if players is not None else ()
         if len(players) > 2:
             raise ValueError("TicTacToe can only have 2 players.")
         while len(players) < 2:
             players += (Player(f"Player {len(players) + 1}"),)
+        assert len(players) == 2
         self.players = (Player("Dummy"), *players)
+        self.verbose = verbose
 
         # Initialize an empty board
         self.reset()
@@ -36,20 +47,20 @@ class TicTacToe:
         self.winner = None
         self.finished = False
 
-    def get_valid_moves(self) -> list[tuple[int, int]]:
+    def get_valid_moves(self) -> list[Action]:
         return list(
             # Get indices of empty cells
             zip(*np.where(self.board == 0), strict=False),
         )
 
-    def is_valid_move(self, move: tuple[int, int]) -> bool:
-        return bool(self.board[*move] == 0)  # Check if the cell is empty
+    def is_valid_move(self, move: Action) -> bool:
+        return bool(self.board[move[0], move[1]] == 0)  # Check if the cell is empty
 
-    def make_move(self, move: tuple[int, int]) -> bool:
+    def make_move(self, move: Action) -> bool:
         if not self.is_valid_move(move) or self.finished:
             return False
 
-        self.board[*move] = self.current_player
+        self.board[move[0], move[1]] = self.current_player
 
         if self.check_winner():
             self.finished = True
@@ -108,16 +119,24 @@ class TicTacToe:
 
     def play(self) -> None:
         while not self.finished:
-            print(self)
+            if self.verbose:
+                print(self)
             current_player = self.players[self.current_player]
-            move = current_player.action()
-            assert self.is_valid_move(move)
-            self.make_move(move)
+            action = current_player.action()
+            assert self.is_valid_move(action)
+            self.make_move(action)
 
-        if self.winner:
-            print(f"Player {self.winner} wins!")
-        else:
-            print("It's a draw!")
+        for i, player in enumerate(self.players):
+            if player is not None:
+                player.end_game(
+                    1 if i == self.winner else 0.5 if self.winner is None else 0,
+                )
+
+        if self.verbose:
+            if self.winner:
+                print(f"Player {self.winner} wins!")
+            else:
+                print("It's a draw!")
 
 
 class Player:
@@ -125,6 +144,10 @@ class Player:
     elo_rating: float
 
     game: TicTacToe
+
+    state_values: dict[str, float]
+    state_counts: dict[str, int]
+    state_buffer: list[str]
 
     def __init__(
         self,
@@ -135,6 +158,9 @@ class Player:
         self.name = name
         self.elo_rating = elo_rating or 1200
         self.rng = np.random.default_rng(random_seed)
+        self.state_values = defaultdict(float)
+        self.state_counts = defaultdict(int)
+        self.state_buffer = []
 
     def __str__(self) -> str:
         return f"Player <{self.name}>"
@@ -142,20 +168,60 @@ class Player:
     def reset(self, game: TicTacToe) -> None:
         """Reset the player."""
         self.game = game
+        self.state_buffer = []
 
-    def action(self) -> tuple[int, int]:
+    def action(self) -> Action:
+        """Select an action at random."""
+        self.state_buffer.append(self.game.state_to_str())
         return tuple(self.rng.choice(self.game.get_valid_moves()))
+
+    def end_game(self, reward: float) -> None:
+        """Update the state values based on the game outcome."""
+        for state in self.state_buffer:
+            self.state_counts[state] += 1
+            self.state_values[state] += (
+                reward - self.state_values[state]
+            ) / self.state_counts[state]
 
 
 class HumanPlayer(Player):
-    def action(self) -> tuple[int, int]:
+    match_regex = re.compile(r"\D*(\d)\D+(\d)")
+
+    def action(self) -> Action:
         print(f"{self.game.get_valid_moves()}")
         response = input("Enter move (row, column): ")
         while True:
-            match = re.match(r"(\d)\D+(\d)", response)
+            match = self.match_regex.match(response)
             if match:
                 move = tuple(map(int, match.groups()))
                 assert len(move) == 2
                 if self.game.is_valid_move(move):
                     return move
             response = input("Invalid move. Enter move (row, column): ")
+
+
+def format_state_value(game: TicTacToe) -> str:
+    players = game.players[1:]
+    state = game.state_to_str()
+    value = max(player.state_values[state] for player in players)
+    return f"State:\n{state}\nValue: {value:.5f}"
+
+
+def main(num_games: int = 10_000) -> None:
+    player_1 = Player("🤖1️⃣")
+    player_2 = Player("🤖2️⃣")
+    game = TicTacToe(players=(player_1, player_2), verbose=False)
+    print(f"Playing {num_games} games…")
+    for _ in trange(num_games):
+        game.play()
+        game.reset()
+    print(format_state_value(game))
+    for x in range(3):
+        for y in range(3):
+            game.reset()
+            game.board[x, y] = 1
+            print(format_state_value(game))
+
+
+if __name__ == "__main__":
+    main()
