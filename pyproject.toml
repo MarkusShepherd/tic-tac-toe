@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tic-tac-toe"
-version = "0.0.2"
+version = "0.0.1"
 description = "Tic Tac Toe Python implementation including Reinforcement Learning strategies"
 authors = [
     "Markus Shepherd <markus@recommend.games>",
