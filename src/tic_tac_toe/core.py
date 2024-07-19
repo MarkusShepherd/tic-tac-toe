@@ -71,15 +71,15 @@ class TicTacToe:
         self.current_player = 3 - self.current_player  # Switch players
         return True
 
-    def check_winner(self) -> bool:
+    def check_winner(self, *, player: int | None = None) -> bool:
         # Check rows, columns, and diagonals for a win
+        player = player or self.current_player
+        assert player in (1, 2)
         for i in range(3):
-            if np.all(self.board[i, :] == self.current_player) or np.all(
-                self.board[:, i] == self.current_player,
-            ):
+            if np.all(self.board[i, :] == player) or np.all(self.board[:, i] == player):
                 return True
-        if np.all(np.diag(self.board) == self.current_player) or np.all(
-            np.diag(np.fliplr(self.board)) == self.current_player,
+        if np.all(np.diag(self.board) == player) or np.all(
+            np.diag(np.fliplr(self.board)) == player,
         ):
             return True
         return False
@@ -137,6 +137,7 @@ class TicTacToe:
                 print(f"Player {self.winner} wins!")
             else:
                 print("It's a draw!")
+            print(self.state_to_str())
 
 
 class Player:
@@ -152,6 +153,7 @@ class Player:
     def __init__(
         self,
         name: str,
+        *,
         elo_rating: float | None = None,
         random_seed: int | None = None,
     ) -> None:
@@ -184,6 +186,100 @@ class Player:
             ) / self.state_counts[state]
 
 
+class HeuristicPlayer(Player):
+    def __init__(
+        self,
+        name: str,
+        *,
+        epsilon: float | None = None,
+        check_winning_move: bool = True,
+        check_blocking_move: bool = True,
+        check_center: bool = True,
+        check_corners: bool = True,
+        elo_rating: float | None = None,
+        random_seed: int | None = None,
+    ) -> None:
+        super().__init__(name=name, elo_rating=elo_rating, random_seed=random_seed)
+        self.epsilon = epsilon
+        self.check_winning_move = check_winning_move
+        self.check_blocking_move = check_blocking_move
+        self.check_center = check_center
+        self.check_corners = check_corners
+
+    def _random_action(self) -> Action:
+        return tuple(self.rng.choice(self.game.get_valid_moves()))
+
+    def _find_winning_move(self) -> Action | None:
+        if not self.check_winning_move:
+            return None
+        valid_moves = self.game.get_valid_moves()
+        self.rng.shuffle(valid_moves)
+        for move in valid_moves:
+            self.game.board[move] = self.game.current_player
+            if self.game.check_winner():
+                self.game.board[move] = 0
+                return move
+            self.game.board[move] = 0
+        return None
+
+    def _find_blocking_move(self) -> Action | None:
+        if not self.check_blocking_move:
+            return None
+        opponent = 3 - self.game.current_player
+        valid_moves = self.game.get_valid_moves()
+        self.rng.shuffle(valid_moves)
+        for move in valid_moves:
+            self.game.board[move] = opponent
+            if self.game.check_winner(player=opponent):
+                self.game.board[move] = 0
+                return move
+            self.game.board[move] = 0
+        return None
+
+    def _find_center_move(self) -> Action | None:
+        if not self.check_center:
+            return None
+        if self.game.board[1, 1] == 0:
+            return 1, 1
+        return None
+
+    def _find_corner_move(self) -> Action | None:
+        if not self.check_corners:
+            return None
+        corner_moves = [(0, 0), (0, 2), (2, 0), (2, 2)]
+        self.rng.shuffle(corner_moves)
+        for move in corner_moves:
+            if self.game.board[move] == 0:
+                return move
+        return None
+
+    def action(self) -> Action:
+        self.state_buffer.append(self.game.state_to_str())
+
+        # Epsilon exploration
+        if self.epsilon and self.rng.random() < self.epsilon:
+            return self._random_action()
+
+        winning_move = self._find_winning_move()
+        if winning_move:
+            return winning_move
+
+        blocking_move = self._find_blocking_move()
+        if blocking_move:
+            return blocking_move
+
+        center_move = self._find_center_move()
+        if center_move:
+            return center_move
+
+        corner_move = self._find_corner_move()
+        if corner_move:
+            return corner_move
+
+        # Select an empty cell at random
+        return self._random_action()
+
+
 class HumanPlayer(Player):
     match_regex = re.compile(r"\D*(\d)\D+(\d)")
 
@@ -208,19 +304,28 @@ def format_state_value(game: TicTacToe) -> str:
 
 
 def main(num_games: int = 10_000) -> None:
-    player_1 = Player("🤖1️⃣")
-    player_2 = Player("🤖2️⃣")
+    player_1 = HeuristicPlayer("🤖1️⃣", epsilon=0.05)
+    player_2 = HeuristicPlayer(
+        "🤖2️⃣",
+        epsilon=None,
+        check_winning_move=True,
+        check_blocking_move=False,
+        check_center=False,
+        check_corners=False,
+    )
     game = TicTacToe(players=(player_1, player_2), verbose=False)
     print(f"Playing {num_games} games…")
     for _ in trange(num_games):
         game.play()
         game.reset()
     print(format_state_value(game))
+    print()
     for x in range(3):
         for y in range(3):
             game.reset()
             game.board[x, y] = 1
             print(format_state_value(game))
+            print()
 
 
 if __name__ == "__main__":

@@ -1,15 +1,15 @@
 import random
 
-from tic_tac_toe.core import HumanPlayer, Player, TicTacToe
+from tic_tac_toe.core import HeuristicPlayer, HumanPlayer, TicTacToe
 
 
 def main() -> None:
     players = [
         HumanPlayer("You"),
-        Player("Random"),
+        HeuristicPlayer("Heuristic"),
     ]
     random.shuffle(players)
-    game = TicTacToe(players=players)
+    game = TicTacToe(players=players, verbose=True)
     game.play()
 
 
