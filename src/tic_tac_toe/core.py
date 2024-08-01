@@ -7,6 +7,7 @@ import numpy as np
 from tqdm import trange
 
 Action = tuple[int, int]
+State = np.ndarray[int, np.dtype[Any]]
 
 
 class TicTacToe:
@@ -15,7 +16,7 @@ class TicTacToe:
         symbol: idx for idx, symbol in enumerate(symbols)
     }
 
-    board: np.ndarray[int, np.dtype[Any]]
+    board: State
     current_player: int
     winner: int | None
     finished: bool
@@ -94,7 +95,7 @@ class TicTacToe:
         return "\n".join(rows)
 
     @classmethod
-    def str_to_state(cls, state: str) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
+    def str_to_state(cls, state: str) -> tuple[State, int]:
         board = np.array(
             [[cls.symbols_to_int[cell] for cell in row] for row in state.split("\n")],
             dtype=int,
@@ -108,7 +109,7 @@ class TicTacToe:
         return int("".join(map(str, self.board.flatten())), 3)
 
     @classmethod
-    def int_to_state(cls, state_int: int) -> tuple[np.ndarray[int, np.dtype[Any]], int]:
+    def int_to_state(cls, state_int: int) -> tuple[State, int]:
         # Convert the base-3 number to a 3x3 array
         board = np.array(
             list(np.base_repr(state_int, base=3).zfill(9)),
