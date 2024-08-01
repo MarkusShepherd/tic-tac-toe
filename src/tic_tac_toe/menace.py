@@ -5,7 +5,9 @@ Tic-Tac-Toe.
 
 from collections import Counter
 
-from tic_tac_toe.core import Action, Player, TicTacToe
+from tqdm import trange
+
+from tic_tac_toe.core import Action, HumanPlayer, Player, TicTacToe, format_state_value
 
 
 class MENACE(Player):
@@ -45,19 +47,56 @@ class MENACE(Player):
     def action(self) -> Action:
         state = self.game.state_to_str()
         self.state_buffer.append(state)
+        valid_moves = self.game.get_valid_moves()
+        if len(valid_moves) == 1:
+            return valid_moves[0]
         matchbox = self.matchboxes[state]
         actions = list(matchbox.elements())
-        if not actions:
-            # TODO(Markus): Gracefully resign the game
-            raise ValueError(f"No valid moves for state {state}")
-        action = tuple(self.rng.choice(actions))
+        # TODO(Markus): Original MENACE would resign if the matchbox is empty
+        action = tuple(self.rng.choice(actions or valid_moves))
         self.action_buffer[state] = action
         return action
 
     def end_game(self, reward: float) -> None:
         super().end_game(reward)
         add_beads = 3 if reward == 1 else -1 if reward == 0 else 1
-        for state in self.state_buffer:
+        for state, action in self.action_buffer.items():
             matchbox = self.matchboxes[state]
-            action = self.action_buffer[state]
             matchbox[action] += add_beads
+            if matchbox[action] < 0:
+                matchbox[action] = 0
+
+
+def main(num_games: int = 10_000) -> None:
+    menace1 = MENACE("MENACE 1")
+    menace2 = MENACE("MENACE 2")
+    players: list[Player] = [menace1, menace2]
+    game = TicTacToe(players=players, verbose=False)
+    print(f"Playing {num_games} games…")
+    for _ in trange(num_games):
+        game.play()
+        game.reset()
+
+    first_state = game.state_to_str()
+    matchbox = menace1.matchboxes[first_state]
+    print(f"Beads in first box: {matchbox.total()}")
+    print(matchbox)
+    print()
+
+    print(format_state_value(game))
+    print()
+
+    for x in range(3):
+        for y in range(3):
+            game.reset()
+            game.board[x, y] = 1
+            print(format_state_value(game))
+            print()
+
+    players = [menace1, HumanPlayer("You")]
+    game = TicTacToe(players=players, verbose=True)
+    game.play()
+
+
+if __name__ == "__main__":
+    main()
