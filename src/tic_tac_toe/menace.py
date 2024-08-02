@@ -59,10 +59,11 @@ class MENACE(Player):
         if len(valid_moves) == 1:
             return valid_moves[0]
         matchbox = self.matchboxes[state]
-        actions = list(matchbox.elements())
-        if not actions:
+        total = matchbox.total()
+        if total < 1:
             raise PlayerResignedError
-        action = tuple(self.rng.choice(actions))
+        probs = np.array([matchbox[move] for move in valid_moves]) / total
+        action = tuple(self.rng.choice(valid_moves, p=probs))
         self.action_buffer[state] = action
         return action
 
@@ -83,7 +84,7 @@ class MENACE(Player):
         probs = np.zeros((3, 3))
         total = matchbox.total()
         for action, count in matchbox.items():
-            probs[action] = count / total
+            probs[action] = count / total if total else 0
         result = "+" + ("-" * 24) + "+\n"
         for state_row, prob_row in zip(state, probs, strict=False):
             result += "| "
@@ -129,4 +130,4 @@ def main(num_games: int = 10_000) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(num_games=100_000)
