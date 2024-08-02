@@ -5,6 +5,7 @@ Tic-Tac-Toe.
 
 from collections import Counter
 
+import numpy as np
 from tqdm import trange
 
 from tic_tac_toe.core import Action, HumanPlayer, Player, TicTacToe, format_state_value
@@ -66,6 +67,28 @@ class MENACE(Player):
             if matchbox[action] < 0:
                 matchbox[action] = 0
 
+    def format_matchbox(self, state_str: str) -> str:
+        state, _ = TicTacToe.str_to_state(state_str)
+        matchbox = self.matchboxes[state_str]
+        probs = np.zeros((3, 3))
+        total = matchbox.total()
+        for action, count in matchbox.items():
+            probs[action] = count / total
+        result = "+" + ("-" * 24) + "+\n"
+        for state_row, prob_row in zip(state, probs, strict=False):
+            result += "| "
+            for cell, prob in zip(state_row, prob_row, strict=False):
+                if cell:
+                    cell_str = TicTacToe.symbols[cell].center(5)
+                else:
+                    cell_str = f"{prob:5.1%}"
+                    if len(cell_str) > 5:
+                        cell_str = " 100%"
+                result += f" {cell_str} |"
+            result += "\n"
+        result += "+" + ("-" * 24) + "+"
+        return result
+
 
 def main(num_games: int = 10_000) -> None:
     menace1 = MENACE("MENACE 1")
@@ -78,12 +101,8 @@ def main(num_games: int = 10_000) -> None:
         game.reset()
 
     first_state = game.state_to_str()
-    matchbox = menace1.matchboxes[first_state]
-    print(f"Beads in first box: {matchbox.total()}")
-    print(matchbox)
-    print()
-
     print(format_state_value(game))
+    print(menace1.format_matchbox(first_state))
     print()
 
     for x in range(3):
@@ -91,6 +110,7 @@ def main(num_games: int = 10_000) -> None:
             game.reset()
             game.board[x, y] = 1
             print(format_state_value(game))
+            print(menace2.format_matchbox(game.state_to_str()))
             print()
 
     players = [menace1, HumanPlayer("You")]
