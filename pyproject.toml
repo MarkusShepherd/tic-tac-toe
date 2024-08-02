@@ -67,6 +67,7 @@ ignore = [
     "PLR2004",  # Plain stupid rule
     "T201",     # Print is fine
     "TRY003",
+    "TRY301",
     "EM101",
     "S101",
     "TD003",
@@ -82,7 +83,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 10
+max-complexity = 15
 
 [tool.ruff.lint.pep8-naming]
 classmethod-decorators = [

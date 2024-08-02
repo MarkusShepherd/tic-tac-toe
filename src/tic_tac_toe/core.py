@@ -6,6 +6,8 @@ from typing import Any, ClassVar
 import numpy as np
 from tqdm import trange
 
+from tic_tac_toe.exceptions import InvalidMoveError
+
 Action = tuple[int, int]
 State = np.ndarray[int, np.dtype[Any]]
 
@@ -123,9 +125,17 @@ class TicTacToe:
             if self.verbose:
                 print(self)
             current_player = self.players[self.current_player]
-            action = current_player.action()
-            assert self.is_valid_move(action)
-            self.make_move(action)
+            try:
+                action = current_player.action()
+                if not self.is_valid_move(action):
+                    raise InvalidMoveError
+            except InvalidMoveError:
+                if self.verbose:
+                    print(f"Invalid move. Player {current_player.name} loses.")
+                self.finished = True
+                self.winner = 3 - self.current_player
+            else:
+                self.make_move(action)
 
         for i, player in enumerate(self.players):
             if player is not None:

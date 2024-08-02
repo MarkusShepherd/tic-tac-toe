@@ -9,6 +9,7 @@ import numpy as np
 from tqdm import trange
 
 from tic_tac_toe.core import Action, HumanPlayer, Player, TicTacToe, format_state_value
+from tic_tac_toe.exceptions import PlayerResignedError
 
 
 class MENACE(Player):
@@ -53,8 +54,9 @@ class MENACE(Player):
             return valid_moves[0]
         matchbox = self.matchboxes[state]
         actions = list(matchbox.elements())
-        # TODO(Markus): Original MENACE would resign if the matchbox is empty
-        action = tuple(self.rng.choice(actions or valid_moves))
+        if not actions:
+            raise PlayerResignedError
+        action = tuple(self.rng.choice(actions))
         self.action_buffer[state] = action
         return action
 
