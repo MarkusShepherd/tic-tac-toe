@@ -20,10 +20,16 @@ class MENACE(Player):
         self,
         name: str,
         *,
+        infinite_exploration: bool = False,
         elo_rating: float | None = None,
         random_seed: int | None = None,
     ) -> None:
-        super().__init__(name=name, elo_rating=elo_rating, random_seed=random_seed)
+        super().__init__(
+            name=name,
+            elo_rating=elo_rating,
+            random_seed=random_seed,
+        )
+        self.infinite_exploration = infinite_exploration
         self.action_buffer: dict[str, Action] = {}
         self.matchboxes = self._seed_matchboxes()
 
@@ -68,6 +74,8 @@ class MENACE(Player):
             matchbox[action] += add_beads
             if matchbox[action] < 0:
                 matchbox[action] = 0
+            if self.infinite_exploration:
+                matchbox | {move: 1 for move in self.game.get_valid_moves()}
 
     def format_matchbox(self, state_str: str) -> str:
         state, _ = TicTacToe.str_to_state(state_str)
@@ -93,8 +101,8 @@ class MENACE(Player):
 
 
 def main(num_games: int = 10_000) -> None:
-    menace1 = MENACE("MENACE 1")
-    menace2 = MENACE("MENACE 2")
+    menace1 = MENACE("MENACE 1", infinite_exploration=True)
+    menace2 = MENACE("MENACE 2", infinite_exploration=True)
     players: list[Player] = [menace1, menace2]
     game = TicTacToe(players=players, verbose=False)
     print(f"Playing {num_games} games…")
