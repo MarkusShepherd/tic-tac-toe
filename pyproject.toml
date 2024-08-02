@@ -73,6 +73,7 @@ ignore = [
     "TD003",
     "FIX002",
     "EM102",
+    "ERA001",
 ]
 
 [tool.ruff.lint.per-file-ignores]

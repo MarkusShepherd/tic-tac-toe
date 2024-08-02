@@ -102,9 +102,10 @@ class MENACE(Player):
 
 
 def main(num_games: int = 10_000) -> None:
-    menace1 = MENACE("MENACE 1", infinite_exploration=True)
-    menace2 = MENACE("MENACE 2", infinite_exploration=True)
-    players: list[Player] = [menace1, menace2]
+    player1 = MENACE("MENACE 1", infinite_exploration=True)
+    # player2 = MENACE("MENACE 2", infinite_exploration=True)
+    player2 = Player("Random")
+    players: list[Player] = [player1, player2]
     game = TicTacToe(players=players, verbose=False)
     print(f"Playing {num_games} games…")
     for _ in trange(num_games):
@@ -113,7 +114,8 @@ def main(num_games: int = 10_000) -> None:
 
     first_state = game.state_to_str()
     print(format_state_value(game))
-    print(menace1.format_matchbox(first_state))
+    if isinstance(player1, MENACE):
+        print(player1.format_matchbox(first_state))
     print()
 
     for x in range(3):
@@ -121,10 +123,11 @@ def main(num_games: int = 10_000) -> None:
             game.reset()
             game.board[x, y] = 1
             print(format_state_value(game))
-            print(menace2.format_matchbox(game.state_to_str()))
+            if isinstance(player2, MENACE):
+                print(player2.format_matchbox(game.state_to_str()))
             print()
 
-    players = [menace1, HumanPlayer("You")]
+    players = [player1, HumanPlayer("You")]
     game = TicTacToe(players=players, verbose=True)
     game.play()
 
